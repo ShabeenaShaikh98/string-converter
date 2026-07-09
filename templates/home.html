@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>String Converter</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'ui-sans-serif', 'system-ui']
+                    },
+                    colors: {
+                        primary: '#4F46E5',
+                        secondary: '#7C3AED',
+                        accent: '#06B6D4',
+                        surface: '#F8FAFC',
+                        line: '#E5E7EB'
+                    },
+                    boxShadow: {
+                        soft: '0 20px 70px rgba(79, 70, 229, 0.12)',
+                        card: '0 16px 45px rgba(15, 23, 42, 0.08)'
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="min-h-screen bg-surface font-sans text-slate-900 antialiased">
+    <main class="relative isolate min-h-screen overflow-hidden px-4 py-8 sm:px-6 lg:px-8">
+        <div class="absolute inset-0 -z-10 bg-[linear-gradient(135deg,#F8FAFC_0%,#EEF2FF_46%,#F5F3FF_100%)]"></div>
+        <div class="absolute inset-0 -z-10 bg-[linear-gradient(rgba(79,70,229,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(6,182,212,0.05)_1px,transparent_1px)] bg-[size:48px_48px]"></div>
+
+        <div class="mx-auto flex max-w-[1200px] flex-col gap-8">
+            <section class="pt-3 text-center">
+                <div class="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-3xl border border-white/80 bg-white/80 shadow-soft backdrop-blur">
+                    <svg class="h-8 w-8 text-primary" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                        <path d="M7 7h10m0 0-3-3m3 3-3 3M17 17H7m0 0 3 3m-3-3 3-3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+                <h1 class="text-4xl font-extrabold tracking-normal text-slate-950 sm:text-5xl lg:text-6xl">String Converter</h1>
+                <p class="mx-auto mt-4 max-w-2xl text-base font-medium leading-7 text-slate-600 sm:text-lg">Convert text between different formats instantly.</p>
+            </section>
+
+            <form method="post" class="rounded-[20px] border border-white/70 bg-white/75 p-4 shadow-soft backdrop-blur-xl sm:p-6 lg:p-8">
+                {% csrf_token %}
+
+                <div class="grid gap-6 lg:grid-cols-[minmax(0,1fr)_340px]">
+                    <section class="space-y-6">
+                        <div class="rounded-[20px] border border-line bg-white/90 p-5 shadow-card transition duration-300 hover:-translate-y-0.5 hover:shadow-soft">
+                            <div class="mb-3 flex items-center gap-2">
+                                <span class="flex h-9 w-9 items-center justify-center rounded-2xl bg-cyan-50 text-accent">
+                                    <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                                        <path d="M4 6h16M4 12h12M4 18h9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                                    </svg>
+                                </span>
+                                <label for="textInput" class="text-sm font-bold text-slate-800">Enter Text</label>
+                            </div>
+                            <div class="relative">
+                                <textarea id="textInput" name="text" rows="10" required placeholder="Type or paste your text here..." class="min-h-[260px] w-full resize-y rounded-2xl border border-line bg-white px-4 py-4 pb-10 text-sm leading-6 text-slate-800 outline-none transition duration-200 placeholder:text-slate-400 focus:border-primary focus:ring-4 focus:ring-indigo-100">{{ text }}</textarea>
+                                <span id="charCount" class="pointer-events-none absolute bottom-3 right-4 text-xs font-semibold text-slate-400">0 characters</span>
+                            </div>
+                        </div>
+
+                        <div class="rounded-[20px] border border-line bg-white/90 p-5 shadow-card transition duration-300 hover:-translate-y-0.5 hover:shadow-soft">
+                            <div class="mb-3 flex items-center justify-between gap-3">
+                                <div class="flex items-center gap-2">
+                                    <span class="flex h-9 w-9 items-center justify-center rounded-2xl bg-indigo-50 text-primary">
+                                        <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                                            <path d="M8 7h8M8 12h5M8 17h8M5 5v14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                                        </svg>
+                                    </span>
+                                    <h2 class="text-sm font-bold text-slate-800">Converted Result</h2>
+                                </div>
+                                <button type="button" id="copyButton" class="inline-flex h-10 items-center gap-2 rounded-2xl border border-line bg-white px-4 text-sm font-bold text-slate-700 shadow-sm transition duration-200 hover:border-primary hover:text-primary hover:shadow-md focus:outline-none focus:ring-4 focus:ring-indigo-100">
+                                    <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                                        <path d="M8 8h9a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H8a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1Z" stroke="currentColor" stroke-width="1.8"/>
+                                        <path d="M5 16H4a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1h9a1 1 0 0 1 1 1v1" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                                    </svg>
+                                    Copy
+                                </button>
+                            </div>
+                            <textarea id="resultOutput" rows="7" readonly placeholder="Your converted result will appear here..." class="min-h-[170px] w-full resize-y rounded-2xl border border-line bg-slate-50/80 px-4 py-4 text-sm leading-6 text-slate-800 outline-none transition duration-200 placeholder:text-slate-400 focus:border-primary focus:ring-4 focus:ring-indigo-100">{% if result %}{{ result }}{% endif %}</textarea>
+                            {% if error %}
+                                <p class="mt-3 rounded-2xl border border-red-100 bg-red-50 px-4 py-3 text-sm font-semibold text-red-600">{{ error }}</p>
+                            {% endif %}
+                        </div>
+                    </section>
+
+                    <aside class="space-y-6">
+                        <div class="rounded-[20px] border border-line bg-white/90 p-5 shadow-card">
+                            <div class="mb-3 flex items-center gap-2">
+                                <span class="flex h-9 w-9 items-center justify-center rounded-2xl bg-violet-50 text-secondary">
+                                    <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                                        <path d="m7 8 4-4 4 4M11 4v16M17 16l-4 4-4-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                </span>
+                                <label for="operationSelect" class="text-sm font-bold text-slate-800">Conversion Type</label>
+                            </div>
+                            <select id="operationSelect" name="operation" required class="h-12 w-full rounded-2xl border border-line bg-white px-4 text-sm font-semibold text-slate-700 outline-none transition duration-200 focus:border-primary focus:ring-4 focus:ring-indigo-100">
+                                <option value="">-- Select Conversion --</option>
+                                <option value="upper" {% if operation == 'upper' %}selected{% endif %}>UPPERCASE</option>
+                                <option value="lower" {% if operation == 'lower' %}selected{% endif %}>lowercase</option>
+                                <option value="title" {% if operation == 'title' %}selected{% endif %}>Title Case</option>
+                                <option value="sentence" {% if operation == 'sentence' %}selected{% endif %}>Sentence Case</option>
+                                <option value="reverse" {% if operation == 'reverse' %}selected{% endif %}>Reverse String</option>
+                                <option value="remove_spaces" {% if operation == 'remove_spaces' %}selected{% endif %}>Remove Extra Spaces</option>
+                                <option value="trim" {% if operation == 'trim' %}selected{% endif %}>Trim Spaces</option>
+                                <option value="camel" {% if operation == 'camel' %}selected{% endif %}>Camel Case</option>
+                                <option value="pascal" {% if operation == 'pascal' %}selected{% endif %}>Pascal Case</option>
+                                <option value="snake" {% if operation == 'snake' %}selected{% endif %}>Snake Case</option>
+                            </select>
+                        </div>
+
+                        <div class="rounded-[20px] border border-line bg-white/90 p-5 shadow-card">
+                            <div class="mb-4 flex items-center gap-2">
+                                <span class="flex h-9 w-9 items-center justify-center rounded-2xl bg-cyan-50 text-accent">
+                                    <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                                        <path d="M12 3 9.8 8.4 4 9l4.4 3.8L7.1 18 12 15.2 16.9 18l-1.3-5.2L20 9l-5.8-.6L12 3Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+                                    </svg>
+                                </span>
+                                <h2 class="text-sm font-bold text-slate-800">Popular Conversions</h2>
+                            </div>
+                            <div class="space-y-2">
+                                <button type="button" class="conversion-item" data-operation="upper"><span>A</span><p>UPPERCASE</p></button>
+                                <button type="button" class="conversion-item" data-operation="lower"><span>a</span><p>lowercase</p></button>
+                                <button type="button" class="conversion-item" data-operation="title"><span>Tt</span><p>Title Case</p></button>
+                                <button type="button" class="conversion-item" data-operation="sentence"><span>S.</span><p>Sentence Case</p></button>
+                                <button type="button" class="conversion-item" data-operation="reverse"><span>Rv</span><p>Reverse String</p></button>
+                                <button type="button" class="conversion-item" data-operation="remove_spaces"><span>Sp</span><p>Remove Extra Spaces</p></button>
+                                <button type="button" class="conversion-item" data-operation="trim"><span>Tr</span><p>Trim Spaces</p></button>
+                                <button type="button" class="conversion-item" data-operation="camel"><span>cC</span><p>Camel Case</p></button>
+                                <button type="button" class="conversion-item" data-operation="pascal"><span>PC</span><p>Pascal Case</p></button>
+                                <button type="button" class="conversion-item" data-operation="snake"><span>_</span><p>Snake Case</p></button>
+                            </div>
+                        </div>
+                    </aside>
+                </div>
+
+                <button type="submit" class="mt-6 flex h-14 w-full items-center justify-center gap-3 rounded-2xl bg-gradient-to-r from-primary via-secondary to-accent text-base font-extrabold text-white shadow-soft transition duration-300 hover:-translate-y-0.5 hover:shadow-[0_24px_70px_rgba(79,70,229,0.25)] focus:outline-none focus:ring-4 focus:ring-indigo-200">
+                    <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                        <path d="M7 7h10m0 0-3-3m3 3-3 3M17 17H7m0 0 3 3m-3-3 3-3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    Convert
+                </button>
+            </form>
+
+            <footer class="pb-2 text-center text-sm font-medium text-slate-500">
+                &copy; 2026 String Converter. All rights reserved.
+            </footer>
+        </div>
+    </main>
+
+    <style>
+        .conversion-item {
+            display: flex;
+            width: 100%;
+            align-items: center;
+            gap: 0.75rem;
+            border-radius: 1rem;
+            border: 1px solid #E5E7EB;
+            background: rgba(248, 250, 252, 0.76);
+            padding: 0.75rem;
+            color: #334155;
+            text-align: left;
+            transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
+        }
+
+        .conversion-item:hover,
+        .conversion-item.is-active {
+            transform: translateY(-1px);
+            border-color: #4F46E5;
+            box-shadow: 0 12px 30px rgba(79, 70, 229, 0.10);
+        }
+
+        .conversion-item.is-active {
+            background: linear-gradient(135deg, rgba(79, 70, 229, 0.10), rgba(6, 182, 212, 0.10));
+        }
+
+        .conversion-item span {
+            display: inline-flex;
+            height: 2rem;
+            width: 2rem;
+            flex: 0 0 2rem;
+            align-items: center;
+            justify-content: center;
+            border-radius: 0.875rem;
+            background: linear-gradient(135deg, rgba(79, 70, 229, 0.12), rgba(6, 182, 212, 0.12));
+            color: #4F46E5;
+            font-size: 0.75rem;
+            font-weight: 800;
+        }
+
+        .conversion-item p {
+            margin: 0;
+            font-size: 0.875rem;
+            font-weight: 700;
+        }
+    </style>
+
+    <script>
+        const textInput = document.getElementById('textInput');
+        const charCount = document.getElementById('charCount');
+        const copyButton = document.getElementById('copyButton');
+        const resultOutput = document.getElementById('resultOutput');
+        const operationSelect = document.getElementById('operationSelect');
+        const conversionItems = document.querySelectorAll('.conversion-item[data-operation]');
+
+        function updateCharacterCount() {
+            const count = textInput.value.length;
+            charCount.textContent = `${count} ${count === 1 ? 'character' : 'characters'}`;
+        }
+
+        textInput.addEventListener('input', updateCharacterCount);
+        updateCharacterCount();
+
+        function updateActiveConversion() {
+            conversionItems.forEach((item) => {
+                item.classList.toggle('is-active', item.dataset.operation === operationSelect.value);
+            });
+        }
+
+        conversionItems.forEach((item) => {
+            item.addEventListener('click', () => {
+                operationSelect.value = item.dataset.operation;
+                updateActiveConversion();
+                operationSelect.focus();
+            });
+        });
+
+        operationSelect.addEventListener('change', updateActiveConversion);
+        updateActiveConversion();
+
+        copyButton.addEventListener('click', async () => {
+            if (!resultOutput.value.trim()) {
+                return;
+            }
+
+            await navigator.clipboard.writeText(resultOutput.value);
+            const originalText = copyButton.innerHTML;
+            copyButton.innerHTML = 'Copied';
+            setTimeout(() => {
+                copyButton.innerHTML = originalText;
+            }, 1200);
+        });
+    </script>
+</body>
+</html>
